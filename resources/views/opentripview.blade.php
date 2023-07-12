@@ -1,6 +1,6 @@
 @extends('layouts.main')
-<title>Open Trip</title>
 @section( 'container')
+
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12 text-center">
@@ -41,19 +41,63 @@
 							 {{ $opentrip->deskripsi }}
 						</p>
 						<p>
-							<a href="{{ route('detailsopentrip.show', $opentrip->id_opentrip) }}" class="learn-more detailslearn"><i class="fa fa-link"></i> Details</a>
+							<a class="learn-more detail-opentrip-{{ $opentrip->id_opentrip }}" id-product="{{ $opentrip->id_opentrip }}"><i class="fa fa-link"></i> Details</a>
 						</p>
 					</div>
-					<span class="maxproduct"><img src="{{ url('storage/opentrip1/') }}/{{ $opentrip->image }}" alt=""></span>
+					<span class="maxproduct"><img src="opentrip1/{{ $opentrip->image }}" alt=""></span>
 				</div>
 				<div class="product-details">
-					<a href="{{ route('detailsopentrip.show', $opentrip->id_opentrip) }}">
+					<a>
 					<h1>{{ $opentrip->nm_opentrip }}</h1>
 					</a>
+					<span class="price">
+					<span class="edd_price">{{ ke_rupiah($opentrip->harga)  }} / Trip</span>
+					</span>
 				</div>
 			</div>
 		</div>
 		@endforeach
+	</div>
+
+	<!-- Modal Detail Opentrip  -->
+	<div id="modal-detail-opentrip" class="modal fade" role="dialog" tabindex="-1">
+		 <div class="modal-dialog modal-dialog-centered">
+		    <div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Detail Opentrip</h4>
+				</div>
+		      	<div class="modal-body">
+			        <form id="detail-item" class="form" method="POST" enctype="multipart/form-data">
+			        	@csrf
+			    	    <div class="row">
+			    	    	<div class="col-md-12">
+			    	    		<p><b>Nama Opentrip	:</b> <span class="nama-item"></span></p>
+			    	    	</div>
+			    	    	<div class="col-md-12">
+			    	    		<p><b>Fasilitas	: </b><span class="fasilitas-item"></span></p> 
+			    	    	</div>
+			    	    	<div class="col-md-12">
+			    	    		<p><b>Harga	: </b><span class="harga-item"></span></p>
+			    	    	</div>
+			    	    	<div class="col-md-12">
+			    	    		<p><b>Deskripsi	: </b><span class="deskripsi-item"></span></p>
+			    	    	</div>
+			    	    </div>
+			        </form>
+		      	</div>
+		      	<div class="modal-footer">
+			        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+			    </div>
+		    </div>
+		 </div>
+	</div>
+
+	<div class="row text-center">
+		<div class="col-md-12"><h2>Kontak Kami</h2></div>
+		<div class="col-md-12">
+			<a target="blank" href="https://wa.me/+6281234567890"><i class="fa fa-whatsapp"> Whatsapp </i></a>
+		</div>
 	</div>
 </div>
 </div>

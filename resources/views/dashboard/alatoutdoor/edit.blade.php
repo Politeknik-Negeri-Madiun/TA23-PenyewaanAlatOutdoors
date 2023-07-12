@@ -20,7 +20,7 @@
                             @method('PUT')
                             <div class="form-group">
                                 <label class="font-weight-bold">Id Alat Outdoor</label>
-                                <input type="text" class="form-control" readonly="" name="id_alatoutdoor" value="{{ old('id_alatoutdoor', $alatoutdoor->id_alatoutdoor) }}" placeholder="Id Alat Outdoor">
+                                <input type="text" class="form-control" name="id_alatoutdoor" value="{{ old('id_alatoutdoor', $alatoutdoor->id_alatoutdoor) }}" readonly>
                             </div>
                             <div class="form-group">
                                 <label class="font-weight-bold">Nama Alat Outdoor</label>
@@ -38,6 +38,10 @@
                                 <select name="id_kategori" id="id_kategori" class="custom-select">
                                     <option value="" selected disabled hidden>--- Pilih Kategori ---</option>
                                     @foreach($kategori as $item)
+
+                                    @if(old('id_kategori', $alatoutdoor->id_kategori) == $item->id_kategori)
+                                    <option value="{{ $item->id_kategori }}" selected>{{ $item->nama_kategori }}</option>
+                                    @endif
                                     <option value="{{ $item->id_kategori }}">{{ $item->nama_kategori }}</option>
                                         
                                     @endforeach
@@ -67,7 +71,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="font-weight-bold">Stok</label>
-                                <input type="text" class="form-control @error('stok') is-invalid @enderror" name="stok" value="{{ old('stok', $alatoutdoor->stok) }}" placeholder="Stok">
+                                <input type="text" class="form-control @error('stok') is-invalid @enderror" name="stok" value="{{ old('stok', $alatoutdoor->stok) }}" placeholder="Stok" readonly>
                             
                                 <!-- error message untuk title -->
                                 @error('stok')
@@ -112,7 +116,7 @@
         </div>
     </div>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.ckeditor.com/4.13.1/standard/ckeditor.js"></script>
 <script>

@@ -7,42 +7,40 @@ use App\Models\Kategori;
 
 class KategoriController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         $kategori = Kategori::get();
 
-        return view('dashboard.kategori.index', ['kategori' => $kategori]);
+        if(session('is_logged_in')){
+            if(session('is_admin')){
+                // Render view with data
+                return view('dashboard.kategori.index', ['kategori' => $kategori]);
+            }else{
+                return view('forbidden');
+            }
+        }else{
+            return view('adminlogin.index');
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        return view('dashboard.kategori.create');
+        // Get ID kategori
+        $get_id_kategori=DB::select('SELECT id_kategori FROM kategoris ORDER BY LENGTH(id_kategori) DESC, id_kategori DESC LIMIT 1');
+        if(!empty($get_id_kategori)){
+            $id_kategori=(int)substr($get_id_kategori[0]->id_kategori,2)+(int)1;
+        }else{
+            $id_kategori=1;
+        }
+
+        return view('dashboard.kategori.create', compact('id_kategori'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
 
-        $id_kategori=Kategori::orderBy('id_kategori', 'DESC')->first();
-        $id_kategoribaru=(int)substr($id_kategori->id_kategori,2)+(int)1;
-
         Kategori::create([
-            'id_kategori'=> 'KT'.$id_kategoribaru,
+            'id_kategori'=> $request->id_kategori,
             'nama_kategori'=> $request->nama_kategori
 
         ]);
@@ -50,24 +48,20 @@ class KategoriController extends Controller
         return redirect()->route('kategori.index')->with(['success' => 'Data Berhasil Disimpan!']);
     }
 
-   
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Kategori $kategori)
     {
-        return view('dashboard.kategori.edit', compact('kategori'));
+        if(session('is_logged_in')){
+            if(session('is_admin')){
+                // Render view with data
+                return view('dashboard.kategori.edit', compact('kategori'));
+            }else{
+                return view('forbidden');
+            }
+        }else{
+            return view('forbidden');
+        }
     }
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function update(Request $request, Kategori $kategori)
     {
         //validate form
@@ -83,13 +77,6 @@ class KategoriController extends Controller
         return redirect()->route('kategori.index')->with(['success' => 'Data Berhasil Diubah!']);
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Kategori $kategori)
     {
         //delete post

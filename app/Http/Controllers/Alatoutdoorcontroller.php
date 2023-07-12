@@ -12,34 +12,35 @@ class Alatoutdoorcontroller extends Controller
 {
     //get data alat outdoor
     public function index(){
-    $alatoutdoor = Alatoutdoor::latest()->simplePaginate(5);
+        $alatoutdoor = Alatoutdoor::latest()->simplePaginate(5);
+        $navbar = 'active';
 
-    //render view with data alat outdoor
-    return view('dashboard.alatoutdoor.index', compact('alatoutdoor'));
-}
+        if(session('is_logged_in')){
+            if(session('is_admin')){
+                //render view with data alat outdoor
+                return view('dashboard.alatoutdoor.index', compact('alatoutdoor','navbar'));
+            }else{
+                return view('forbidden');
+            }
+        }else{
+            return view('adminlogin.index');
+        }
+    }
 
     public function create(){
 
         $kategori = Kategori::get();
-
         $alatoutdoor = Alatoutdoor::all();
 
-            $q = DB::table('alatoutdoors')->select(DB::raw('MAX(RIGHT(id_alatoutdoor,2)) as kode'));
-            $kd ="";
-            if($q->count()>0)
-            {
-                foreach($q->get() as $k)
-                {
-                    $tmp = ((int)$k->kode)+1;
-                    $kd = sprintf("%02s", $tmp);
-                }
-            }
-            else
-            {
-                $kd = "01";
-            }
+        // Get ID alatoutdoor
+        $get_id_alatoutdoor=DB::select('SELECT id_alatoutdoor FROM alatoutdoors ORDER BY LENGTH(id_alatoutdoor) DESC, id_alatoutdoor DESC LIMIT 1');
+        if(!empty($get_id_alatoutdoor)){
+            $id_alatoutdoor=(int)substr($get_id_alatoutdoor[0]->id_alatoutdoor,2)+(int)1;
+        }else{
+            $id_alatoutdoor=1;
+        }
 
-        return view('dashboard.alatoutdoor.create', ['kategori' => $kategori], compact('alatoutdoor','kd'));
+        return view('dashboard.alatoutdoor.create', ['kategori' => $kategori], compact('alatoutdoor','id_alatoutdoor'));
     }
 
     public function store(Request $request)
@@ -59,10 +60,9 @@ class Alatoutdoorcontroller extends Controller
 
         //upload image
         $image = $request->file('image');
-        $image->storeAs('public/alatoutdoor1', $image->hashName());
+        $imageName = time() . '.' . $image->getClientOriginalName();
+        $image->move('alatoutdoor1', $imageName);
 
-        // $id_alatoutdoor=Alatoutdoor::orderBy('id_alatoutdoor', 'DESC')->first();
-        // $id_alatoutdoorbaru=(int)substr($id_alatoutdoor->id_alatoutdoor,2)+(int)1;
         //create post
         Alatoutdoor::create([
             'id_alatoutdoor'=>$request->id_alatoutdoor,
@@ -73,7 +73,7 @@ class Alatoutdoorcontroller extends Controller
             'stok'=>$request->stok,
             'harga_sewa'=>$request->harga_sewa,
             'merk'=>$request->merk,
-            'image' => $image->hashName(),
+            'image' => $imageName,
         ]);
     
 
@@ -84,7 +84,16 @@ class Alatoutdoorcontroller extends Controller
     public function edit(Alatoutdoor $alatoutdoor)
     {
         $kategori = Kategori::get();
-        return view('dashboard.alatoutdoor.edit', compact('alatoutdoor'), ['kategori'=>$kategori]);
+        if(session('is_logged_in')){
+            if(session('is_admin')){
+                // Render view with data
+                return view('dashboard.alatoutdoor.edit', compact('alatoutdoor'), ['kategori'=>$kategori]);
+            }else{
+                return view('forbidden');
+            }
+        }else{
+            return view('forbidden');
+        }
     }
 
     public function update(Request $request, Alatoutdoor $alatoutdoor)
@@ -107,7 +116,8 @@ class Alatoutdoorcontroller extends Controller
 
             //upload new image
             $image = $request->file('image');
-            $image->storeAs('public/alatoutdoor1', $image->hashName());
+            $imageName = time() . '.' . $image->getClientOriginalName();
+            $image->move('alatoutdoor1', $imageName);
 
             //delete old image
             Storage::delete('public/alatoutdoor1/'.$alatoutdoor->image);
@@ -121,7 +131,7 @@ class Alatoutdoorcontroller extends Controller
                 'stok'=>$request->stok,
                 'harga_sewa'=>$request->harga_sewa,
                 'merk'=>$request->merk,
-                'image' => $image->hashName(),
+                'image' => $imageName,
             ]);
 
         } else {

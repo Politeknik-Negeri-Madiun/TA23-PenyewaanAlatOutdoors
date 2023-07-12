@@ -9,34 +9,38 @@ use Illuminate\Support\Facades\DB;
 
 class OpentripController extends Controller
 {
-    public function index(){
-    //get posts
-    $opentrip = Opentrip::latest()->simplePaginate(5);
+    public function index()
+    {
+        //get posts
+        $opentrip = Opentrip::latest()->simplePaginate(5);
+        $navbar = 'active';
 
-    //render view with posts
-    return view('dashboard.opentrip.index', compact('opentrip'));
-}
-    public function create()
-        {
-            $opentrip = Opentrip::all();
-
-            $id_opentrip = DB::table('opentrips')->select(DB::raw('MAX(RIGHT(id_opentrip,3)) as kode'));
-            $id_opentripbaru ="";
-            if($id_opentrip->count()>0)
-            {
-                foreach($id_opentrip->get() as $k)
-                {
-                    $tmp = ((int)$k->kode)+2;
-                    $id_opentripbaru = sprintf("%03s", $tmp);
-                }
+        if(session('is_logged_in')){
+            if(session('is_admin')){
+                //render view with posts
+                return view('dashboard.opentrip.index', compact('opentrip','navbar'));
+            }else{
+                return view('forbidden');
             }
-            else
-            {
-                $id_opentripbaru = "001";
-            }
-
-            return view('dashboard.opentrip.create', compact('opentrip', 'id_opentripbaru'));
+        }else{
+            return view('adminlogin.index');
         }
+    }
+
+    public function create()
+    {
+        $opentrip = Opentrip::all();
+        
+        // Get ID opentrip
+        $get_id_opentrip=DB::select('SELECT id_opentrip FROM opentrips ORDER BY LENGTH(id_opentrip) DESC, id_opentrip DESC LIMIT 1');
+        if(!empty($get_id_opentrip)){
+            $id_opentrip=(int)substr($get_id_opentrip[0]->id_opentrip,2)+(int)1;
+        }else{
+            $id_opentrip=1;
+        }
+
+        return view('dashboard.opentrip.create', compact('opentrip', 'id_opentrip'));
+    }
 
     public function store(Request $request)
     {
@@ -50,11 +54,9 @@ class OpentripController extends Controller
 
         //upload image
         $image = $request->file('image');
-        $image->storeAs('public/opentrip1', $image->hashName());
+        $imageName = time() . '.' . $image->getClientOriginalName();
+        $image->move('opentrip1', $imageName);
 
-        // $id_opentrip=Opentrip::orderBy('id_opentrip', 'DESC')->first();
-        // $id_opentripbaru=(int)substr($id_opentrip->id_opentrip,2)+(int)1;
-        
         //create post
         Opentrip::create([
             'id_opentrip'=>$request->id_opentrip,
@@ -62,7 +64,7 @@ class OpentripController extends Controller
             'deskripsi'=>$request->deskripsi,
             'fasilitas'=>$request->fasilitas,
             'harga'=>$request->harga,
-            'image' => $image->hashName(),
+            'image' => $imageName,
         ]);
 
         //redirect to index
@@ -71,7 +73,15 @@ class OpentripController extends Controller
 
     public function edit(Opentrip $opentrip)
     {
-        return view('dashboard.opentrip.edit', compact('opentrip'));
+        if(session('is_logged_in')){
+            if(session('is_admin')){
+                return view('dashboard.opentrip.edit', compact('opentrip'));
+            }else{
+                return view('forbidden');
+            }
+        }else{
+            return view('forbidden');
+        }
     }
  
     public function update(Request $request, Opentrip $opentrip)
@@ -91,7 +101,8 @@ class OpentripController extends Controller
 
             //upload new image
             $image = $request->file('image');
-            $image->storeAs('public/opentrip1', $image->hashName());
+            $imageName = time() . '.' . $image->getClientOriginalName();
+            $image->move('opentrip1', $imageName);
 
             //delete old image
             Storage::delete('public/opentrip1/'.$opentrip->image);
@@ -102,7 +113,7 @@ class OpentripController extends Controller
                 'deskripsi'=>$request->deskripsi,
                 'fasilitas'=>$request->fasilitas,
                 'harga'=>$request->harga,
-                'image' => $image->hashName(),
+                'image' => $imageName,
             ]);
 
         } else {
@@ -119,6 +130,7 @@ class OpentripController extends Controller
         //redirect to index
         return redirect()->route('opentrip.index')->with(['success' => 'Data Berhasil Diubah!']);
     }
+
     public function destroy(Opentrip $opentrip)
     {
         //delete image

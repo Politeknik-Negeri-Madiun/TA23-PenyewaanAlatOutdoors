@@ -20,7 +20,7 @@
                             @method('PUT')
                             <div class="form-group">
                                 <label class="font-weight-bold">Id Open Trip</label>
-                                <input type="text" class="form-control" readonly="" name="id_opentrip" value="{{ old('id_opentrip', $opentrip->id_opentrip) }}" placeholder="Id Open Trip">
+                                <input type="text" class="form-control" name="id_opentrip" value="{{ old('id_opentrip', $opentrip->id_opentrip) }}" readonly>
                             </div>
                             <div class="form-group">
                                 <label class="font-weight-bold">Nama Open Trip</label>
@@ -80,7 +80,7 @@
         </div>
     </div>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.ckeditor.com/4.13.1/standard/ckeditor.js"></script>
 <script>

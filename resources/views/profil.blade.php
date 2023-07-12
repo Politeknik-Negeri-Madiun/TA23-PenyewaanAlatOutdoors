@@ -1,22 +1,21 @@
 @extends('layouts.main')
-<title>Profile</title>
 @section( 'container')
-<header>
-<div class="container">
-	<div class="row">
-		<div class="col-md-12 text-center">
-			<div class="text-pageheader">
-				<div class="subtext-image" data-scrollreveal="enter bottom over 1.7s after 0.0s">
-					 Profil
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12 text-center">
+				<div class="text-pageheader">
+					<div class="subtext-image" data-scrollreveal="enter bottom over 1.7s after 0.0s">
+						 Profil
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
-</div>
+	</div>
 </header>
-<!-- CONTENT =============================-->
 
+<!-- CONTENT =============================-->
 <section class="item content">
 <div class="container toparea">
 	<p>
@@ -40,21 +39,37 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-lg-8 col-lg-offset-2">
-			<div class="done">
-				<div class="alert alert-success">
-					<button type="button" class="close" data-dismiss="alert">×</button>
-					Your message has been sent. Thank you!
-				</div>
+		@if (session('status_input'))
+			<div class="alert alert-success">
+				{{ session('status_input') }}
 			</div>
-			<form method="post" action="contact.php" id="contactform">
+		@endif
+		<div class="col-lg-8 col-lg-offset-2">
+			<?php if(!empty($data_user)){ ?>
+			<form method="POST" action="{{ route('profile.user_comment') }}" id="contactform">
 				<div class="form">
-					<input type="text" name="name" placeholder="Your Name *">
-					<input type="text" name="email" placeholder="Your E-mail Address *">
-					<textarea name="comment" rows="7" placeholder="Type your Message *"></textarea>
+					@csrf
+			        <div class="form-group">
+			        	<label for="jaminan">Nama Pelanggan</label> *
+			            <input type="text" name="nama_pelanggan" placeholder="Your Name *" value="{{ $data_user->nama_pelanggan }}" disabled />
+			        </div>
+
+			        <div class="form-group">
+			        	<label for="jaminan">Email</label> *
+			            <input type="text" name="email_pelanggan" placeholder="Your E-mail Address *" value="{{ $data_user->email }}" disabled />
+			        </div>
+
+					<div class="form-group">
+			        	<label for="jaminan">Komentar</label> *
+			            <textarea name="komentar" rows="7" placeholder="Type your Message *"></textarea>
+			        </div>
+					
 					<input type="submit" id="submit" class="clearfix btn" value="Send">
 				</div>
 			</form>
+			<?php } else { ?>
+				<h3 class="text-center latestitems">Anda Harus login terlebih dahulu</h3>
+			<?php } ?>
 		</div>
 	</div>
 </div>
